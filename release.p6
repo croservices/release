@@ -19,6 +19,12 @@ sub MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
         write-tar($_, $dist-name, $tar-name);
         say "* $tar-name";
     }
+
+    say "Tagging releases";
+    for @distros {
+        tag($_, "release-$version");
+        say "* $_";
+    }
 }
 
 sub check-version($distro, $target-version) {
@@ -42,6 +48,10 @@ sub check-clean-diff($distro) {
 
 sub write-tar($distro, $dist-name, $tar-name) {
     shell "cd $distro && git archive --prefix=$dist-name/ -o ../$tar-name HEAD"
+}
+
+sub tag($distro, $tag) {
+    shell "cd $distro && git tag -a -m '$tag' $tag && git push --tags origin"
 }
 
 sub conk($err) {
