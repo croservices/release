@@ -7,8 +7,12 @@ sub MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
         }
     }
 
+    # Bump versions and commit bumps.
     for @distros {
-        check-version($_, $version);
+        bump-version($_, $version);
+    }
+
+    for @distros {
         check-clean-diff($_);
     }
 
@@ -27,12 +31,17 @@ sub MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
     }
 }
 
-sub check-version($distro, $target-version) {
-    given slurp("$distro/META6.json") -> $json {
-        with $json ~~ /'"version"' \s* ':' \s* '"' (<-["]>+) '"'/ {
-            if .[0] ne $target-version {
-                conk "Version in $distro/META6.json is {.[0]}, not $target-version";
-            }
+sub bump-version($distro, $version) {
+    my $file = "$distro/META6.json";
+    given slurp($file) -> $json {
+        if $json ~~ /$version/ {
+            note "$distro/META6.json already up to date with version number";
+            return;
+        }
+        my $updated = $json.subst(/'"version"' \s* ':' \s* '"' <( <-["]>+ )> '"'/, $version);
+        if $updated ~~ /$version/ {
+            spurt $file, $updated;
+            shell "cd $distro && git commit -m 'Bump version to $version' META6.json && git push origin master"
         }
         else {
             conk "Could not find version in $distro/META6.json";
