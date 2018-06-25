@@ -7,6 +7,10 @@ sub MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
         }
     }
 
+    for @distros {
+        check-clean-diff($_);
+    }
+
     # Bump version number of docker image to use in templates.
     bump-docker-image-version($version);
 
@@ -14,11 +18,6 @@ sub MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
     for @distros {
         bump-version($_, $version);
     }
-
-    for @distros {
-        check-clean-diff($_);
-    }
-
     say "Pre-release checks passed; writing tarballs";
     for @distros {
         my $dist-name = "$_-$version";
