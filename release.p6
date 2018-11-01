@@ -1,4 +1,4 @@
-my constant @distros = 'cro-core', 'cro-tls', 'cro-http', 'cro-websocket', 'cro-zeromq', 'cro', 'cro-http-test', 'cro-http-session-redis';
+my constant @distros = 'cro-core', 'cro-tls', 'cro-http', 'cro-websocket', 'cro-zeromq', 'cro', 'cro-http-session-redis';
 
 sub MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
     for @distros {
