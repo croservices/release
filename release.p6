@@ -10,6 +10,7 @@ sub MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
 
     for @distros {
         check-clean-diff($_);
+        pull($_);
     }
 
     # Bump version number of docker image to use in templates.
@@ -76,6 +77,10 @@ sub check-clean-diff($distro) {
     if qqx/cd $distro && git diff/ {
         conk "Dirty working tree in $distro";
     }
+}
+
+sub pull($distro) {
+    shell "cd $distro && git pull"
 }
 
 sub write-tar($distro, $dist-name, $tar-name) {
