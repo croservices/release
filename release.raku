@@ -3,11 +3,11 @@ use JSON::Fast;
 my constant @distros = 'cro-core', 'cro-tls', 'cro-http', 'cro-websocket',
                        'cro-webapp', 'cro';
 
-multi MAIN(:$clean) {
+multi MAIN(:$clean!) {
     shell "rm -rf $_" if .IO.d for @distros;
 }
 
-multi MAIN(:$get) {
+multi MAIN(:$get!) {
     shell "git clone https://github.com/croservices/$_.git" unless .IO.d for @distros;
 }
 
