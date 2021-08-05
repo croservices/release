@@ -1,7 +1,17 @@
-my constant @distros = 'cro-core', 'cro-tls', 'cro-http', 'cro-websocket',
-        'cro-webapp', 'cro';
+use JSON::Fast;
 
-sub MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
+my constant @distros = 'cro-core', 'cro-tls', 'cro-http', 'cro-websocket',
+                       'cro-webapp', 'cro';
+
+multi MAIN(:$clean) {
+    shell "rm -rf $_" if .IO.d for @distros;
+}
+
+multi MAIN(:$get) {
+    shell "git clone https://github.com/croservices/$_.git" unless .IO.d for @distros;
+}
+
+multi MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
     for @distros {
         unless .IO.d {
             conk "Missing directory '$_' (script expects Cro repos checked out in CWD)";
@@ -57,12 +67,23 @@ sub bump-docker-image-version($version) {
 
 sub bump-version($distro, $version) {
     my $file = "$distro/META6.json";
-    given slurp($file) -> $json {
-        if $json ~~ /$version/ {
+    my $json = slurp $file;
+    my $meta = from-json $json;
+    given $meta {
+        my $updated;
+        # Update the module version itself
+        if $meta<version> eq $version {
             note "$distro/META6.json already up to date with version number";
-            return;
+        } else {
+            $updated = $json.subst(/'"version"' \s* ':' \s* '"' <( <-["]>+ )> '"'/, $version);
         }
-        my $updated = $json.subst(/'"version"' \s* ':' \s* '"' <( <-["]>+ )> '"'/, $version);
+        # Next update dependencies
+        for @($meta<depends>) -> $module {
+            if $module ~~ /('Cro::' \w+)/ {
+                $updated .= subst(/ '"depends"' \s* ':' \s* '[' <-[\]]>*? <( $module )> <-[\]]>*? ']' /, "$0\:ver<$version>");
+            }
+        }
+
         if $updated ~~ /$version/ {
             spurt $file, $updated;
             shell "cd $distro && git commit -m 'Bump version to $version' META6.json && git push origin master"
