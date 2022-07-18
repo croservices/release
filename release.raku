@@ -30,18 +30,19 @@ multi MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
     for @distros {
         bump-version($_, $version);
     }
-    say "Pre-release checks passed; writing tarballs";
-    for @distros {
-        my $dist-name = "$_-$version";
-        my $tar-name = "$dist-name.tar.gz";
-        write-tar($_, $dist-name, $tar-name);
-        say "* $tar-name";
-    }
 
-    say "Tagging releases";
+    # Tag
+    say "Pre-release checks passed; tagging releases";
     for @distros {
         tag($_, "release-$version");
         say "* $_";
+    }
+
+    # Release
+    say "Uploading to zef ecosystem";
+    for @distros {
+        say "# $_";
+        shell "cd $_ && fez upload";
     }
 }
 
@@ -102,10 +103,6 @@ sub check-clean-diff($distro) {
 
 sub pull($distro) {
     shell "cd $distro && git pull"
-}
-
-sub write-tar($distro, $dist-name, $tar-name) {
-    shell "cd $distro && git archive --prefix=$dist-name/ -o ../$tar-name HEAD"
 }
 
 sub tag($distro, $tag) {
