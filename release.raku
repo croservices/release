@@ -47,7 +47,7 @@ multi MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
 }
 
 sub bump-docker-image-version($version) {
-    my $file = 'cro/lib/Cro/Tools/Template/Common.pm6';
+    my $file = 'cro/lib/Cro/Tools/Template/Common.rakumod';
     given slurp($file) -> $common {
         if $common ~~ /"my constant CRO_DOCKER_VERSION = '$version'"/ {
             note "Docker version already updated";
@@ -58,7 +58,7 @@ sub bump-docker-image-version($version) {
             $version;
         if $updated ~~ /$version/ {
             spurt $file, $updated;
-            shell "cd cro && git commit -m 'Bump docker images to $version' lib/Cro/Tools/Template/Common.pm6 && git push origin master"
+            shell "cd cro && git commit -m 'Bump docker images to $version' lib/Cro/Tools/Template/Common.rakumod && git push origin master"
         }
         else {
             die "Could not find version to update in $file";
