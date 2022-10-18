@@ -8,7 +8,7 @@ multi MAIN(:$clean!) {
 }
 
 multi MAIN(:$get!) {
-    shell "git clone https://github.com/croservices/$_.git" unless .IO.d for @distros;
+    shell "git clone git@github.com:/croservices/$_.git" unless .IO.d for @distros;
 }
 
 multi MAIN(Str $version where /^\d+'.'\d+['.'\d+]?$/) {
