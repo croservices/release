@@ -43,7 +43,7 @@ multi MAIN(:$prepare!) {
     }
 
     # Bump version number of docker image to use in templates.
-    bump-docker-image-version($version);
+    bump-oci-image-version($versions<oci_image>);
 
     # Bump versions and commit bumps.
     my @bumped-distros;
@@ -55,8 +55,10 @@ multi MAIN(:$prepare!) {
 
     # Tag
     say "Pre-release checks passed; tagging releases";
-    for @distros {
-        tag($_, "release-$version");
+    for @bumped-distros {
+        my $dir = %distro-dirs{$_};
+        my $version = %versions<distros>{$_};
+        tag($dir, "release-$version");
         say "* $_";
     }
     prepare-announcement(@bumped-distros, $versions);
@@ -64,9 +66,10 @@ multi MAIN(:$prepare!) {
 
     # Release
     say "Uploading to zef ecosystem";
-    for @distros {
+    for @bumped-distros {
+        my $dir = %distro-dirs{$_};
         say "# $_";
-        shell "cd $_ && fez upload";
+        shell "cd $dir && fez upload";
     }
 }
 
@@ -130,7 +133,7 @@ sub prepare-announcement(@bumped-distros, %versions) {
     spurt $file, $releases;
 }
 
-sub bump-docker-image-version($version) {
+sub bump-oci-image-version($version) {
     my $file = 'cro/lib/Cro/Tools/Template/Common.rakumod';
     given slurp($file) -> $common {
         if $common ~~ /"my constant CRO_DOCKER_VERSION = '$version'"/ {
