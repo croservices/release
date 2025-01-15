@@ -63,8 +63,9 @@ multi MAIN(:$prepare!) {
         tag($dir, "release-$version");
         say "* $_";
     }
-    prepare-announcement(@bumped-distros, %versions);
 
+    say "Creating an announcement template";
+    prepare-announcement(@bumped-distros, %versions);
 
     # Release
     say "Uploading to zef ecosystem";
@@ -131,7 +132,14 @@ sub prepare-announcement(@bumped-distros, %versions) {
                .subst('{{DISTROS}}', $distros-text);
 
     my $releases = slurp($file);
-    $releases ~~ s/ "# Cro Release History" \n \n /$/$text\n/;
+
+    if $releases ~~ / "# Cro Release History" \n \n / {
+        $releases ~~ s/ "# Cro Release History" \n \n /$/$text\n/;
+    }
+    else {
+        note "Could not find \"# Cro Release History\" in $file, just spurting the announcement at the top.";
+        $releases ~~ s/ ^ /$text\n/;
+    }
     spurt $file, $releases;
 }
 
