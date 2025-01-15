@@ -33,6 +33,9 @@ multi MAIN(:$prepare!) {
 
     my %versions = from-json $*PROGRAM.parent.add("versions.json").slurp;
 
+    # Check that fez is there.
+    shell "fez";
+
     for %distro-dirs.values {
         unless .IO.d {
             conk "Missing directory '$_' (script expects Cro repos checked out in CWD)";
@@ -201,7 +204,7 @@ sub bump-version($distro-dir, $name, %distro-versions, $api-version) {
 
         if $updated ~~ /$my-version/ {
             spurt $file, $updated;
-            shell "cd $distro-dir && git commit -m 'Bump version to $my-version' META6.json && git push origin main"
+            shell "cd $distro-dir && git commit -m 'Bump version to $my-version' META6.json Changes && git push origin main"
         }
         else {
             conk "Could not find version in $distro-dir/META6.json";
