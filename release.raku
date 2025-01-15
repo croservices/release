@@ -237,7 +237,7 @@ sub get-latest-release-tag($distro-dir) {
 
 sub get-committers($distro-dir) {
     my $last-tag = get-latest-release-tag $distro-dir;
-    my $proc = shell "cd $distro-dir && git log --no-merges --pretty=format:\"\%cn\" $last-tag..HEAD", :out;
+    my $proc = shell "cd $distro-dir && git log --no-merges --pretty=format:\"\%aN\" $last-tag..HEAD", :out;
     my $out = $proc.out.slurp: :close;
     $out.lines.unique;
 }
