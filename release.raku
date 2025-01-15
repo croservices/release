@@ -72,6 +72,9 @@ multi MAIN(:$prepare!) {
     for @bumped-distros {
         my $dir = %distro-dirs{$_};
         say "# $_";
+        do {
+            shell "cd $dir && fez review";
+        } while prompt("Does this look sane? [yn]") ne "y";
         shell "cd $dir && fez upload";
     }
 }
