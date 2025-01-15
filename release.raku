@@ -1,3 +1,5 @@
+#!/usr/bin/env raku
+
 use JSON::Fast;
 
 my constant @distros = 'Cro::Core',
@@ -29,7 +31,7 @@ multi MAIN(:$prepare!) {
     # Change versioning scheme.
     # Generate release log template from Changes files and committers.
 
-    my $versions = from-json $*PROGRAM.parent.add("versions.json").slurp;
+    my %versions = from-json $*PROGRAM.parent.add("versions.json").slurp;
 
     for %distro-dirs.values {
         unless .IO.d {
@@ -43,13 +45,13 @@ multi MAIN(:$prepare!) {
     }
 
     # Bump version number of docker image to use in templates.
-    bump-oci-image-version($versions<oci_image>);
+    bump-oci-image-version(%versions<oci_image>);
 
     # Bump versions and commit bumps.
     my @bumped-distros;
     for @distros -> $name {
         my $dir = %distro-dirs{$name};
-        my $bumped = bump-version($dir, $name, $versions<distros>, $versions<api>);
+        my $bumped = bump-version($dir, $name, %versions<distros>, %versions<api>);
         @bumped-distros.push($name) if $bumped;
     }
 
@@ -61,7 +63,7 @@ multi MAIN(:$prepare!) {
         tag($dir, "release-$version");
         say "* $_";
     }
-    prepare-announcement(@bumped-distros, $versions);
+    prepare-announcement(@bumped-distros, %versions);
 
 
     # Release
@@ -145,7 +147,7 @@ sub bump-oci-image-version($version) {
             $version;
         if $updated ~~ /$version/ {
             spurt $file, $updated;
-            shell "cd cro && git commit -m 'Bump docker images to $version' lib/Cro/Tools/Template/Common.rakumod && git push origin master";
+            shell "cd cro && git commit -m 'Bump docker images to $version' lib/Cro/Tools/Template/Common.rakumod && git push origin main";
         }
         else {
             die "Could not find version to update in $file";
@@ -188,7 +190,7 @@ sub bump-version($distro-dir, $name, %distro-versions, $api-version) {
 
         if $updated ~~ /$my-version/ {
             spurt $file, $updated;
-            shell "cd $distro && git commit -m 'Bump version to $version' META6.json && git push origin master"
+            shell "cd $distro-dir && git commit -m 'Bump version to $my-version' META6.json && git push origin main"
         }
         else {
             conk "Could not find version in $distro-dir/META6.json";
