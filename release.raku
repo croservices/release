@@ -126,7 +126,7 @@ sub prepare-announcement(@bumped-distros, %versions) {
     }).join("\n\n");
 
     my $versions-text = @distros.map({
-        $_
+        "- " ~ $_
         ~ ':ver<' ~ %versions<distros>{$_} ~ '>'
         ~ ':api<' ~ %versions<api> ~ '>' ~
         ~ ':auth<zef:cro>'
