@@ -84,7 +84,11 @@ multi MAIN(:$prepare!) {
 
 sub prepare-announcement(@bumped-distros, %versions) {
     my $template = Q:to/EOT/;
-        ## {{DATE}}
+        ## {{DATE}} [[[ADD A SNAPPY TITLE HERE]]]
+
+        [[[ Add a few nice words here! ]]]
+
+        ---
 
         The latest versions of the Cro libraries are:
 

@@ -1,16 +1,22 @@
 How to do a release
 ===================
 
-- Change the version numbers in `versions.json` to the versions you want to
-  release. Keep the versions of modules you don't want to release unchanged.
-- Run `release.raku --prepare` in a folder containing clones of all of the
-  Cro distros:
+- Have all of the 6 core Cro projects
   - cro-core
   - cro-tls
   - cro-http
   - cro-websocket
   - cro-webapp
   - cro
+  as well as the website (cro-website) checked out in a folder.
+- Ensure the `fez` program is available and you are logged in and are a member
+  of the `cro` org.
+- Ensure all the clones of each project have a remote called `origin` that
+  allows writes.
+- Change the version numbers in `versions.json` to the versions you want to
+  release. Keep the versions of modules you don't want to release unchanged.
+- Run `release.raku --prepare` in the parent folder of of the above mentioned
+  repos.
   This will then automatically do the following:
   - `git pull` in all the repos
   - Create a commit and push in `cro` that bumps the OCI image version.
