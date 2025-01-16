@@ -1,0 +1,12 @@
+{
+    "api": "0",
+    "distros": {
+        "cro": "0.8.10",
+        "Cro::Core": "0.8.10",
+        "Cro::HTTP": "0.8.10",
+        "Cro::TLS": "0.8.10",
+        "Cro::WebApp": "0.9.0",
+        "Cro::WebSocket": "0.8.10"
+    },
+    "oci_image": "0.8.10"
+}
