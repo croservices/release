@@ -117,7 +117,13 @@ sub prepare-announcement(@bumped-distros, %versions) {
         my $version = %versions<distros>{$distro};
         my $changes-file = "$dir/Changes".IO.slurp;
         do if $changes-file ~~ / ^^ $version [\h <-[ \n ]>*]? \n ( [ <!before \n \S > . ]+ ) / {
-            my $changes = $0.trim-trailing.lines.map(*.substr(4)).join("\n");
+            my $changes = $0
+                .trim-trailing
+                .lines
+                .map(*.substr(4))
+                .map(*.subst(/^ '- '/, '* '))
+                .join("\n");
+            $changes = $changestrim-trailing.lines.map(*.substr(4)).join("\n");
             $distro-template
                 .subst('{{NAME}}', $distro)
                 .subst('{{VERSION}}', $version)
@@ -130,7 +136,7 @@ sub prepare-announcement(@bumped-distros, %versions) {
     }).join("\n\n");
 
     my $versions-text = @distros.map({
-        "- " ~ $_
+        "* " ~ $_
         ~ ':ver<' ~ %versions<distros>{$_} ~ '>'
         ~ ':api<' ~ %versions<api> ~ '>' ~
         ~ ':auth<zef:cro>'
