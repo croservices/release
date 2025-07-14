@@ -123,7 +123,6 @@ sub prepare-announcement(@bumped-distros, %versions) {
                 .map(*.substr(4))
                 .map(*.subst(/^ '- '/, '* '))
                 .join("\n");
-            $changes = $changestrim-trailing.lines.map(*.substr(4)).join("\n");
             $distro-template
                 .subst('{{NAME}}', $distro)
                 .subst('{{VERSION}}', $version)
@@ -209,6 +208,9 @@ sub bump-version($distro-dir, $name, %distro-versions, $api-version) {
         # Update version in Changes
         my $changes-file = "$distro-dir/Changes";
         my $changes = $changes-file.IO.slurp;
+        unless $changes ~~ /'{{NEXT}}'/ {
+            conk "Could not find \{\{NEXT\}\} marker in $distro-dir/Changes";
+        }
         $changes ~~ s/'{{NEXT}}'/$my-version/;
         spurt $changes-file, $changes;
 
