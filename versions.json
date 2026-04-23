@@ -1,9 +1,8 @@
-{
-    "api": "0",
+{ "api": "0",
     "distros": {
         "cro": "0.8.10",
         "Cro::Core": "0.8.10",
-        "Cro::HTTP": "0.8.11",
+        "Cro::HTTP": "0.8.12",
         "Cro::TLS": "0.8.10",
         "Cro::WebApp": "0.10.0",
         "Cro::WebSocket": "0.8.10"
