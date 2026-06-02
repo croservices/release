@@ -2,7 +2,7 @@
     "distros": {
         "cro": "0.8.10",
         "Cro::Core": "0.8.10",
-        "Cro::HTTP": "0.8.12",
+        "Cro::HTTP": "0.8.13",
         "Cro::TLS": "0.8.10",
         "Cro::WebApp": "0.10.0",
         "Cro::WebSocket": "0.8.10"
